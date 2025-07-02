@@ -411,8 +411,7 @@ You can compile this script into a `.exe` using `PyInstaller`.
 
 ## 🐍 Final Full Python Script — `qr_generator_full.py`
 
-> 💾 Save as: `qr_generator_full.py`
-> ⚠️ Make sure there's no file named `qrcode.py` in the same folder.
+> 💾 Save as: `qr_generator_ultimate.py`
 
 \[The code is large. Click below to expand.]
 
@@ -424,7 +423,7 @@ You can compile this script into a `.exe` using `PyInstaller`.
 </details>
 
 
-Here is the **final full Python script**: `qr_generator_full.py` — supporting:
+Here is the **final full Python script**: `qr_generator_ultimate.py` — supporting:
 
 * All standard + advanced QR types
 * Colors, logos, export to PNG, PDF
@@ -434,10 +433,9 @@ Here is the **final full Python script**: `qr_generator_full.py` — supporting:
 
 ---
 
-## 🐍 `qr_generator_full.py` — Full Script (Stage 2 & 3 Included)
+## 🐍 `qr_generator_ultimate.py` — Full Script
 
 ```python
-# qr_generator_full.py
 import subprocess
 import sys
 import os
@@ -450,37 +448,35 @@ def install_dependencies():
         from PIL import Image, ImageTk
         import tkinter as tk
         from tkinter import ttk, messagebox, filedialog, colorchooser
+        import pyperclip
     except ImportError:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "qrcode", "pillow"])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "qrcode", "pillow", "pyperclip"])
         import qrcode
         from PIL import Image, ImageTk
         import tkinter as tk
         from tkinter import ttk, messagebox, filedialog, colorchooser
-    return qrcode, Image, ImageTk, tk, ttk, messagebox, filedialog, colorchooser
+        import pyperclip
+    return qrcode, Image, ImageTk, tk, ttk, messagebox, filedialog, colorchooser, pyperclip
 
-qrcode_lib, Image, ImageTk, tk, ttk, messagebox, filedialog, colorchooser = install_dependencies()
+qrcode_lib, Image, ImageTk, tk, ttk, messagebox, filedialog, colorchooser, pyperclip = install_dependencies()
+
+HISTORY_FILE = "qr_history.csv"
 
 def generate_qr(content, fg="black", bg="white", logo_path=None, output_path="qrcode_output.png"):
-    qr = qrcode_lib.QRCode(
-        version=1,
-        error_correction=qrcode_lib.constants.ERROR_CORRECT_H,
-        box_size=10,
-        border=4
-    )
+    qr = qrcode_lib.QRCode(version=1, error_correction=qrcode_lib.constants.ERROR_CORRECT_H, box_size=10, border=4)
     qr.add_data(content)
     qr.make(fit=True)
     img = qr.make_image(fill_color=fg, back_color=bg).convert("RGB")
     if logo_path and os.path.exists(logo_path):
         logo = Image.open(logo_path)
         qr_w, qr_h = img.size
-        logo_size = qr_w // 5
-        logo = logo.resize((logo_size, logo_size), Image.LANCZOS)
-        pos = ((qr_w - logo_size) // 2, (qr_h - logo_size) // 2)
+        logo = logo.resize((qr_w // 5, qr_h // 5), Image.LANCZOS)
+        pos = ((qr_w - logo.size[0]) // 2, (qr_h - logo.size[1]) // 2)
         img.paste(logo, pos, mask=logo if logo.mode == "RGBA" else None)
     img.save(output_path)
     return img
 
-def save_as_pdf(image, path="qrcode_output.pdf"):
+def save_as_pdf(image, path):
     image.convert("RGB").save(path, "PDF", resolution=100.0)
 
 def print_qr(image_path):
@@ -492,14 +488,42 @@ def print_qr(image_path):
         os.system(f"lpr '{image_path}'")
 
 def save_history(entry_type, content):
-    path = os.path.join(os.getcwd(), "qr_history.csv")
-    with open(path, mode="a", newline='', encoding='utf-8') as f:
+    with open(HISTORY_FILE, mode="a", newline='', encoding='utf-8') as f:
         csv.writer(f).writerow([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), entry_type, content])
+
+def open_history_viewer():
+    import tkinter as tk
+    from tkinter import ttk, filedialog
+
+    win = tk.Toplevel()
+    win.title("QR Code History Viewer")
+    win.geometry("600x400")
+
+    tree = ttk.Treeview(win, columns=("time", "type", "content"), show="headings")
+    tree.heading("time", text="Timestamp")
+    tree.heading("type", text="Type")
+    tree.heading("content", text="Content")
+    tree.column("content", width=300)
+
+    if os.path.exists(HISTORY_FILE):
+        with open(HISTORY_FILE, newline='', encoding='utf-8') as f:
+            for row in csv.reader(f):
+                if row: tree.insert("", "end", values=row)
+
+    tree.pack(expand=True, fill="both")
+
+    def export():
+        path = filedialog.asksaveasfilename(defaultextension=".csv")
+        if path and os.path.exists(HISTORY_FILE):
+            with open(HISTORY_FILE, "r", encoding="utf-8") as src, open(path, "w", encoding="utf-8") as dst:
+                dst.write(src.read())
+            messagebox.showinfo("Exported", f"Saved to {path}")
+
+    ttk.Button(win, text="Export History as CSV", command=export).pack(pady=5)
 
 def launch_gui():
     def clear_fields():
-        for widget in input_frame.winfo_children():
-            widget.grid_remove()
+        for w in input_frame.winfo_children(): w.grid_remove()
         input_entries.clear()
 
     def show_fields(selection):
@@ -508,10 +532,10 @@ def launch_gui():
             "Text / URL": ["Text or URL:"],
             "Wi-Fi": ["SSID:", "Password:", "Security (WPA/WEP):"],
             "SMS": ["Phone Number:", "Message:"],
-            "Email": ["To Address:", "Subject:", "Body:"],
+            "Email": ["To:", "Subject:", "Body:"],
             "Contact (vCard)": ["Full Name:", "Phone:", "Email:"],
             "WhatsApp Chat": ["Phone Number:", "Message:"],
-            "PayPal Payment": ["PayPal.me Link:"]
+            "PayPal Payment": ["PayPal.me link or username:"]
         }
         for i, label in enumerate(fields.get(selection, [])):
             ttk.Label(input_frame, text=label).grid(row=i, column=0, sticky="w")
@@ -521,19 +545,21 @@ def launch_gui():
 
     def choose_color(var, title):
         color = colorchooser.askcolor(title=title)[1]
-        if color:
-            var.set(color)
+        if color: var.set(color)
 
     def choose_logo():
         path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png;*.jpg;*.jpeg")])
-        if path:
-            logo_path.set(path)
+        if path: logo_path.set(path)
+
+    def paste_clipboard():
+        if input_entries:
+            clip = pyperclip.paste()
+            input_entries[0].delete(0, tk.END)
+            input_entries[0].insert(0, clip)
 
     def on_generate():
-        nonlocal current_image, current_content, current_type
+        nonlocal current_image
         t = type_var.get()
-        current_type = t
-
         try:
             if t == "Text / URL":
                 content = input_entries[0].get()
@@ -554,87 +580,78 @@ def launch_gui():
                 content = f"https://wa.me/{n}?text={m}"
             elif t == "PayPal Payment":
                 link = input_entries[0].get()
-                content = link if link.startswith("https://paypal.me/") else f"https://paypal.me/{link}"
+                content = link if "paypal.me" in link else f"https://paypal.me/{link}"
             else:
-                raise Exception("Unsupported type")
+                return
 
-            current_content = content
             current_image = generate_qr(content, fg_color.get(), bg_color.get(), logo_path.get())
-            resized = current_image.resize((300, 300), Image.LANCZOS)
-            photo = ImageTk.PhotoImage(resized)
+            img_resized = current_image.resize((300, 300), Image.LANCZOS)
+            photo = ImageTk.PhotoImage(img_resized)
             qr_label.config(image=photo)
             qr_label.image = photo
             current_image.save("qrcode_output.png")
-            save_history(current_type, current_content)
+            save_history(t, content)
+
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
     def on_save_pdf():
-        if not current_image:
-            messagebox.showwarning("Missing", "Generate a QR first.")
-            return
-        path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF", "*.pdf")])
-        if path:
-            save_as_pdf(current_image, path)
-            messagebox.showinfo("Saved", path)
+        if not current_image: return
+        path = filedialog.asksaveasfilename(defaultextension=".pdf")
+        if path: save_as_pdf(current_image, path)
 
     def on_print():
-        if not current_image:
-            messagebox.showwarning("Missing", "Generate a QR first.")
-            return
-        print_qr("qrcode_output.png")
+        if current_image: print_qr("qrcode_output.png")
 
-    # GUI setup
+    # GUI Init
     root = tk.Tk()
-    root.title("QR Code Generator Pro")
-    root.geometry("580x700")
+    root.title("QR Code Generator Ultimate")
+    root.geometry("600x780")
     root.resizable(False, False)
 
     type_var = tk.StringVar()
-    ttk.Label(root, text="Choose QR Type:").pack(pady=(10, 0))
     combo = ttk.Combobox(root, textvariable=type_var, values=[
         "Text / URL", "Wi-Fi", "SMS", "Email", "Contact (vCard)", "WhatsApp Chat", "PayPal Payment"
     ], state="readonly", width=30)
-    combo.pack()
+    combo.set("Text / URL")
+    combo.pack(pady=(10, 0))
     combo.bind("<<ComboboxSelected>>", lambda e: show_fields(type_var.get()))
 
     input_frame = ttk.Frame(root)
-    input_frame.pack(pady=10)
+    input_frame.pack(pady=5)
     input_entries = []
+    show_fields("Text / URL")
 
-    # Color pickers
+    ttk.Button(root, text="Paste from Clipboard", command=paste_clipboard).pack()
+
     color_frame = ttk.Frame(root)
     color_frame.pack()
     fg_color = tk.StringVar(value="black")
     bg_color = tk.StringVar(value="white")
-    ttk.Label(color_frame, text="Foreground:").grid(row=0, column=0)
+    ttk.Label(color_frame, text="FG:").grid(row=0, column=0)
     ttk.Button(color_frame, text="Pick", command=lambda: choose_color(fg_color, "Foreground")).grid(row=0, column=1)
     ttk.Label(color_frame, textvariable=fg_color).grid(row=0, column=2)
-
-    ttk.Label(color_frame, text="Background:").grid(row=1, column=0)
+    ttk.Label(color_frame, text="BG:").grid(row=1, column=0)
     ttk.Button(color_frame, text="Pick", command=lambda: choose_color(bg_color, "Background")).grid(row=1, column=1)
     ttk.Label(color_frame, textvariable=bg_color).grid(row=1, column=2)
 
-    # Logo
     logo_path = tk.StringVar()
-    ttk.Label(root, text="Add Logo (optional):").pack()
-    ttk.Button(root, text="Upload Logo", command=choose_logo).pack()
-    ttk.Label(root, textvariable=logo_path).pack()
+    ttk.Label(root, text="Logo (optional):").pack()
+    ttk.Button(root, text="Choose Logo Image", command=choose_logo).pack()
+    ttk.Label(root, textvariable=logo_path, foreground="gray").pack()
 
-    ttk.Button(root, text="Generate QR Code", command=on_generate).pack(pady=10)
+    ttk.Button(root, text="Generate QR Code", command=on_generate).pack(pady=5)
+
     qr_label = ttk.Label(root)
-    qr_label.pack(pady=10)
+    qr_label.pack(pady=8)
 
-    # Export buttons
-    actions = ttk.Frame(root)
-    actions.pack(pady=5)
-    ttk.Button(actions, text="Save as PDF", command=on_save_pdf).grid(row=0, column=0, padx=5)
-    ttk.Button(actions, text="Print QR Code", command=on_print).grid(row=0, column=1, padx=5)
+    action_frame = ttk.Frame(root)
+    action_frame.pack(pady=5)
+    ttk.Button(action_frame, text="Save as PDF", command=on_save_pdf).grid(row=0, column=0, padx=5)
+    ttk.Button(action_frame, text="Print", command=on_print).grid(row=0, column=1, padx=5)
+    ttk.Button(action_frame, text="View History", command=open_history_viewer).grid(row=0, column=2, padx=5)
 
     current_image = None
-    current_content = ""
-    current_type = ""
-
     root.mainloop()
 
 if __name__ == "__main__":
@@ -668,4 +685,3 @@ pyinstaller --noconsole --onefile --icon=icon.ico qr_generator_full.py
 * Output `.exe` will be in the `dist` folder.
 
 ---
-
