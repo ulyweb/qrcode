@@ -579,3 +579,246 @@ python qr_generator_gui.py
 ---
 
 
+Version 2 of GUI QR Code generator with **three powerful new features**:
+
+---
+
+## ✅ New Additions to the GUI Tool
+
+### 1. **Save QR Code as PDF**
+
+* Saves the generated QR Code as a `.pdf` file along with the image.
+
+### 2. **Print the QR Code**
+
+* Sends the QR Code image to the system print dialog (works on Windows/macOS/Linux).
+
+### 3. **Export History**
+
+* Records every QR generation (type + data + timestamp) into a `qr_history.csv` log file.
+
+---
+
+## 🐍 Full Upgraded Python Script (GUI + Save PDF + Print + History)
+
+> 💾 **Save this as `qr_generator_gui_v2.py`**
+
+```python
+import subprocess
+import sys
+import os
+from datetime import datetime
+import csv
+
+# Ensure required modules
+def install_dependencies():
+    try:
+        import qrcode
+        from PIL import Image, ImageTk
+        import tkinter as tk
+        from tkinter import ttk, messagebox, filedialog
+    except ImportError:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "qrcode", "pillow"])
+        import qrcode
+        from PIL import Image, ImageTk
+        import tkinter as tk
+        from tkinter import ttk, messagebox, filedialog
+    return qrcode, Image, ImageTk, tk, ttk, messagebox, filedialog
+
+qrcode_lib, Image, ImageTk, tk, ttk, messagebox, filedialog = install_dependencies()
+
+
+# Utility: generate and save QR image
+def generate_qr(content, path="qrcode_output.png"):
+    qr = qrcode_lib.QRCode(
+        version=1,
+        error_correction=qrcode_lib.constants.ERROR_CORRECT_Q,
+        box_size=10,
+        border=4
+    )
+    qr.add_data(content)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    img.save(path)
+    return img
+
+
+# Utility: save QR code as PDF
+def save_as_pdf(image, path="qrcode_output.pdf"):
+    rgb_img = image.convert("RGB")
+    rgb_img.save(path, "PDF", resolution=100.0)
+
+
+# Utility: print QR code
+def print_qr(image_path):
+    if sys.platform.startswith("win"):
+        os.startfile(image_path, "print")
+    elif sys.platform.startswith("darwin"):  # macOS
+        os.system(f"lp '{image_path}'")
+    else:  # Linux
+        os.system(f"lpr '{image_path}'")
+
+
+# Utility: log history
+def save_history(entry_type, content):
+    history_path = os.path.join(os.getcwd(), "qr_history.csv")
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(history_path, mode="a", newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow([timestamp, entry_type, content])
+
+
+# GUI
+def launch_gui():
+    def clear_fields():
+        for widget in input_frame.winfo_children():
+            widget.grid_remove()
+        input_entries.clear()
+
+    def show_fields(selection):
+        clear_fields()
+        if selection == "Text / URL":
+            ttk.Label(input_frame, text="Enter Text or URL:").grid(row=0, column=0, sticky="w")
+            entry = ttk.Entry(input_frame, width=40)
+            entry.grid(row=0, column=1)
+            input_entries.append(entry)
+        elif selection == "Wi-Fi":
+            labels = ["SSID:", "Password:", "Security (WPA/WEP/n):"]
+            for i, text in enumerate(labels):
+                ttk.Label(input_frame, text=text).grid(row=i, column=0, sticky="w")
+                entry = ttk.Entry(input_frame, width=30)
+                entry.grid(row=i, column=1)
+                input_entries.append(entry)
+        elif selection == "SMS":
+            ttk.Label(input_frame, text="Phone Number:").grid(row=0, column=0, sticky="w")
+            phone = ttk.Entry(input_frame, width=30)
+            phone.grid(row=0, column=1)
+
+            ttk.Label(input_frame, text="Message:").grid(row=1, column=0, sticky="w")
+            msg = ttk.Entry(input_frame, width=30)
+            msg.grid(row=1, column=1)
+
+            input_entries.extend([phone, msg])
+
+    def on_generate():
+        nonlocal current_image, current_content, current_type
+
+        qr_type = type_var.get()
+        current_type = qr_type
+
+        if qr_type == "Text / URL":
+            text = input_entries[0].get().strip()
+            if not text:
+                messagebox.showerror("Error", "Text is required.")
+                return
+            current_content = text
+
+        elif qr_type == "Wi-Fi":
+            ssid = input_entries[0].get().strip()
+            password = input_entries[1].get().strip()
+            security = input_entries[2].get().strip().upper() or "WPA"
+            if not ssid:
+                messagebox.showerror("Error", "SSID is required.")
+                return
+            current_content = f"WIFI:T:{security};S:{ssid};P:{password};;"
+
+        elif qr_type == "SMS":
+            number = input_entries[0].get().strip()
+            msg = input_entries[1].get().strip()
+            if not number:
+                messagebox.showerror("Error", "Phone number is required.")
+                return
+            current_content = f"SMSTO:{number}:{msg}"
+
+        else:
+            messagebox.showerror("Error", "Select a valid QR type.")
+            return
+
+        try:
+            current_image = generate_qr(current_content)
+            img_resized = current_image.resize((300, 300), Image.LANCZOS)
+            photo = ImageTk.PhotoImage(img_resized)
+            qr_label.config(image=photo)
+            qr_label.image = photo
+
+            # Save PNG automatically
+            current_image.save("qrcode_output.png")
+
+            # Save history
+            save_history(current_type, current_content)
+
+        except Exception as e:
+            messagebox.showerror("QR Error", str(e))
+
+    def on_save_pdf():
+        if not current_image:
+            messagebox.showwarning("No QR", "Generate a QR Code first.")
+            return
+        path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF files", "*.pdf")])
+        if path:
+            save_as_pdf(current_image, path)
+            messagebox.showinfo("Saved", f"Saved to {path}")
+
+    def on_print():
+        if not current_image:
+            messagebox.showwarning("No QR", "Generate a QR Code first.")
+            return
+        print_qr("qrcode_output.png")
+        messagebox.showinfo("Print", "Print command sent.")
+
+    # Build GUI
+    root = tk.Tk()
+    root.title("QR Code Generator")
+    root.geometry("500x580")
+    root.resizable(False, False)
+
+    ttk.Label(root, text="Select QR Type:").pack(pady=(10, 0))
+    type_var = tk.StringVar()
+    combo = ttk.Combobox(root, textvariable=type_var, values=["Text / URL", "Wi-Fi", "SMS"], state="readonly", width=25)
+    combo.pack()
+    combo.bind("<<ComboboxSelected>>", lambda e: show_fields(type_var.get()))
+
+    input_frame = ttk.Frame(root)
+    input_frame.pack(pady=10)
+    input_entries = []
+
+    ttk.Button(root, text="Generate QR Code", command=on_generate).pack(pady=8)
+
+    qr_label = ttk.Label(root)
+    qr_label.pack(pady=8)
+
+    # Action Buttons
+    action_frame = ttk.Frame(root)
+    action_frame.pack(pady=5)
+    ttk.Button(action_frame, text="Save as PDF", command=on_save_pdf).grid(row=0, column=0, padx=5)
+    ttk.Button(action_frame, text="Print QR Code", command=on_print).grid(row=0, column=1, padx=5)
+
+    current_image = None
+    current_content = ""
+    current_type = ""
+
+    root.mainloop()
+
+
+# Run it
+if __name__ == "__main__":
+    launch_gui()
+```
+
+---
+
+## ✅ Features
+
+| Feature          | Description                                   |
+| ---------------- | --------------------------------------------- |
+| Text/URL Support | Create QR for plain text, websites            |
+| Wi-Fi QR         | Share SSID + Password + Security easily       |
+| SMS QR           | Encodes phone number + message                |
+| Save as PDF      | Export to PDF for printing/sharing            |
+| Print QR         | One-click print using system print dialog     |
+| History Log      | `qr_history.csv` tracks all generated entries |
+
+---
+
+
+
