@@ -376,4 +376,206 @@ Save this file as `index.html` in your repo. When pushed to GitHub Pages, it wil
 
 ---
 
-## 💡 **You Can:**
+## ✅ Here's the python version that will work locally for QRCode only!
+
+---
+
+This version includes:
+
+* A **Graphical User Interface (GUI)** using `tkinter`.
+* Ability to generate QR codes for:
+
+  1. **Plain Text / URLs**
+  2. **Wi-Fi Credentials**
+  3. **SMS Messages**
+* Automatically installs missing dependencies.
+
+---
+
+## 🐍 Full Updated Python Script (Cross-Platform GUI Tool)
+
+> 💡 **Save this as `qr_generator_gui.py`** and delete any conflicting files like `qrcode.py` first!
+
+```python
+import subprocess
+import sys
+import os
+
+# Step 1: Ensure dependencies are installed
+def install_dependencies():
+    try:
+        import qrcode
+        from PIL import Image, ImageTk
+        import tkinter as tk
+        from tkinter import ttk, messagebox
+    except ImportError:
+        print("Installing required packages...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "qrcode", "pillow"])
+        import qrcode
+        from PIL import Image, ImageTk
+        import tkinter as tk
+        from tkinter import ttk, messagebox
+    return qrcode, Image, ImageTk, tk, ttk, messagebox
+
+qrcode_lib, Image, ImageTk, tk, ttk, messagebox = install_dependencies()
+
+
+# Step 2: Define QR generation logic
+def generate_qr(content, output_path="qrcode_output.png"):
+    qr = qrcode_lib.QRCode(
+        version=1,
+        error_correction=qrcode_lib.constants.ERROR_CORRECT_Q,
+        box_size=10,
+        border=4
+    )
+    qr.add_data(content)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    img.save(output_path)
+    return output_path
+
+
+# Step 3: GUI logic
+def launch_gui():
+    def clear_fields():
+        for widget in input_frame.winfo_children():
+            widget.grid_remove()
+        for widget in input_entries:
+            widget.delete(0, tk.END)
+
+    def show_fields(selection):
+        clear_fields()
+        if selection == "Text / URL":
+            lbl = ttk.Label(input_frame, text="Enter Text or URL:")
+            lbl.grid(row=0, column=0, sticky="w")
+            entry = ttk.Entry(input_frame, width=40)
+            entry.grid(row=0, column=1)
+            input_entries[:] = [entry]
+        elif selection == "Wi-Fi":
+            labels = ["SSID:", "Password:", "Security (WPA/WEP/n):"]
+            for i, label in enumerate(labels):
+                ttk.Label(input_frame, text=label).grid(row=i, column=0, sticky="w")
+                entry = ttk.Entry(input_frame, width=30)
+                entry.grid(row=i, column=1)
+                input_entries.append(entry)
+        elif selection == "SMS":
+            ttk.Label(input_frame, text="Phone Number:").grid(row=0, column=0, sticky="w")
+            phone_entry = ttk.Entry(input_frame, width=30)
+            phone_entry.grid(row=0, column=1)
+
+            ttk.Label(input_frame, text="Message:").grid(row=1, column=0, sticky="w")
+            message_entry = ttk.Entry(input_frame, width=30)
+            message_entry.grid(row=1, column=1)
+
+            input_entries[:] = [phone_entry, message_entry]
+
+    def on_generate():
+        selection = type_var.get()
+        if selection == "Text / URL":
+            text = input_entries[0].get().strip()
+            if not text:
+                messagebox.showerror("Error", "Text cannot be empty.")
+                return
+            content = text
+
+        elif selection == "Wi-Fi":
+            ssid = input_entries[0].get().strip()
+            password = input_entries[1].get().strip()
+            security = input_entries[2].get().strip().upper() or "WPA"
+            if not ssid:
+                messagebox.showerror("Error", "SSID is required.")
+                return
+            content = f"WIFI:T:{security};S:{ssid};P:{password};;"
+
+        elif selection == "SMS":
+            number = input_entries[0].get().strip()
+            msg = input_entries[1].get().strip()
+            if not number:
+                messagebox.showerror("Error", "Phone number is required.")
+                return
+            content = f"SMSTO:{number}:{msg}"
+
+        else:
+            messagebox.showerror("Error", "Please select a type.")
+            return
+
+        try:
+            output_path = generate_qr(content)
+            img = Image.open(output_path).resize((300, 300), Image.LANCZOS)
+            photo = ImageTk.PhotoImage(img)
+            qr_label.config(image=photo)
+            qr_label.image = photo
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to generate QR Code:\n{e}")
+
+    # GUI Window
+    root = tk.Tk()
+    root.title("QR Code Generator")
+    root.geometry("500x500")
+    root.resizable(False, False)
+
+    # Top selection area
+    type_var = tk.StringVar()
+    ttk.Label(root, text="Choose QR Code Type:").pack(pady=(10, 0))
+    combo = ttk.Combobox(root, textvariable=type_var, values=["Text / URL", "Wi-Fi", "SMS"], state="readonly", width=20)
+    combo.pack(pady=(0, 10))
+    combo.bind("<<ComboboxSelected>>", lambda e: show_fields(type_var.get()))
+
+    # Frame for dynamic input fields
+    input_frame = ttk.Frame(root)
+    input_frame.pack(pady=10)
+
+    input_entries = []  # dynamic entry fields
+
+    # Generate button
+    ttk.Button(root, text="Generate QR Code", command=on_generate).pack(pady=10)
+
+    # Label for displaying QR code
+    qr_label = ttk.Label(root)
+    qr_label.pack(pady=10)
+
+    root.mainloop()
+
+
+# Step 4: Run GUI
+if __name__ == "__main__":
+    launch_gui()
+```
+
+---
+
+## 🧪 How to Use
+
+### 1. **Save as**: `qr_generator_gui.py`
+
+> 🚫 Make sure there's **no file named `qrcode.py`** in the same folder!
+
+### 2. **Run the script**:
+
+```bash
+python qr_generator_gui.py
+```
+
+### 3. **Pick your mode**:
+
+* Select one of:
+
+  * "Text / URL"
+  * "Wi-Fi"
+  * "SMS"
+* Fill the inputs.
+* Click **"Generate QR Code"** — it will display the QR code instantly.
+
+---
+
+## 🧩 Dependencies (auto-installed)
+
+| Package   | Purpose                      |
+| --------- | ---------------------------- |
+| `qrcode`  | QR Code generation           |
+| `Pillow`  | Image rendering for GUI      |
+| `tkinter` | Cross-platform GUI (builtin) |
+
+---
+
+
