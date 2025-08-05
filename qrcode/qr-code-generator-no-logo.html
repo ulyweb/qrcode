@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple QR Code Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+    }
+    input[type="text"], select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      box-sizing: border-box;
+    }
+    canvas {
+      margin-top: 20px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>QR Code Generator</h1>
+  <input type="text" id="qr-input" placeholder="Enter text or URL">
+
+  <label for="resolution-select">Resolution</label>
+  <select id="resolution-select">
+    <option value="256">256x256</option>
+    <option value="512">512x512</option>
+    <option value="1024">1024x1024</option>
+  </select>
+
+  <canvas id="qr-canvas"></canvas>
+
+  <button id="generate-btn">Generate QR Code</button>
+  <button id="download-btn" disabled>Download QR Code</button>
+</div>
+
+<!-- QRCode.js library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+  document.getElementById('generate-btn').addEventListener('click', async function () {
+    const text = document.getElementById('qr-input').value;
+    const resolution = parseInt(document.getElementById('resolution-select').value);
+    const canvas = document.getElementById('qr-canvas');
+    const ctx = canvas.getContext('2d');
+
+    if (!text) {
+      alert('Please enter text to encode.');
+      return;
+    }
+
+    canvas.width = canvas.height = resolution;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const tempDiv = document.createElement('div');
+    const qr = new QRCode(tempDiv, {
+      text: text,
+      width: resolution,
+      height: resolution,
+      correctLevel: QRCode.CorrectLevel.H
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 100)); // wait for QR image to render
+
+    const qrImg = tempDiv.querySelector('img');
+    if (!qrImg) {
+      alert("QR code generation failed.");
+      return;
+    }
+
+    const image = new Image();
+    image.src = qrImg.src;
+
+    image.onload = () => {
+      ctx.drawImage(image, 0, 0, resolution, resolution);
+      document.getElementById('download-btn').disabled = false;
+    };
+  });
+
+  document.getElementById('download-btn').addEventListener('click', () => {
+    const canvas = document.getElementById('qr-canvas');
+    const link = document.createElement('a');
+    link.download = 'qr_code.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  });
+</script>
+</body>
+</html>
