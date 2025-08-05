@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Code Generator with Logo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+    }
+    input[type="text"], select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      box-sizing: border-box;
+    }
+    canvas {
+      margin-top: 20px;
+    }
+    img#logo-preview {
+      max-width: 100px;
+      margin-top: 10px;
+      display: none;
+    }
+    .file-upload-label {
+      display: inline-block;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .file-upload-label:hover {
+      background-color: #0056b3;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>QR Code Generator with Logo</h1>
+  <input type="text" id="qr-input" placeholder="Enter text or URL">
+
+  <label for="resolution-select">Resolution</label>
+  <select id="resolution-select">
+    <option value="256">256x256</option>
+    <option value="512">512x512</option>
+    <option value="1024">1024x1024</option>
+  </select>
+
+  <label class="file-upload-label">
+    Upload Logo
+    <input type="file" id="logo-input" accept="image/*" style="display:none;">
+  </label>
+  <img id="logo-preview" alt="Logo Preview">
+
+  <canvas id="qr-canvas"></canvas>
+
+  <button id="generate-btn">Generate QR Code</button>
+  <button id="download-btn" disabled>Download QR Code</button>
+</div>
+
+<!-- QRCode.js library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+  let logoFile = null;
+
+  document.getElementById('logo-input').addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    const logoPreview = document.getElementById('logo-preview');
+
+    if (file) {
+      logoFile = file;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        logoPreview.src = e.target.result;
+        logoPreview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    } else {
+      logoFile = null;
+      logoPreview.style.display = 'none';
+    }
+  });
+
+  document.getElementById('generate-btn').addEventListener('click', async function () {
+    const text = document.getElementById('qr-input').value;
+    const resolution = parseInt(document.getElementById('resolution-select').value);
+    const canvas = document.getElementById('qr-canvas');
+    const ctx = canvas.getContext('2d');
+
+    if (!text) {
+      alert('Please enter text to encode.');
+      return;
+    }
+
+    if (!logoFile) {
+      alert('Please upload a logo before generating the QR code.');
+      return;
+    }
+
+    canvas.width = canvas.height = resolution;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const tempDiv = document.createElement('div');
+    const qr = new QRCode(tempDiv, {
+      text: text,
+      width: resolution,
+      height: resolution,
+      correctLevel: QRCode.CorrectLevel.H
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 100)); // Wait for QR to render
+
+    const qrImg = tempDiv.querySelector('img');
+    if (!qrImg) {
+      alert("QR code generation failed.");
+      return;
+    }
+
+    const image = new Image();
+    image.src = qrImg.src;
+
+    image.onload = () => {
+      ctx.drawImage(image, 0, 0, resolution, resolution);
+
+      const logo = new Image();
+      logo.src = URL.createObjectURL(logoFile);
+
+      logo.onload = () => {
+        const logoSize = resolution * 0.35; // increased from 0.2 to 0.35 (35%)
+        const x = (resolution - logoSize) / 2;
+        const y = (resolution - logoSize) / 2;
+
+        ctx.fillStyle = 'white';
+        ctx.fillRect(x, y, logoSize, logoSize);
+        ctx.drawImage(logo, x, y, logoSize, logoSize);
+
+        URL.revokeObjectURL(logo.src);
+        document.getElementById('download-btn').disabled = false;
+      };
+    };
+  });
+
+  document.getElementById('download-btn').addEventListener('click', () => {
+    const canvas = document.getElementById('qr-canvas');
+    const link = document.createElement('a');
+    link.download = 'qr_code_with_logo.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  });
+</script>
+</body>
+</html>
