@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Advanced QR Code Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background-color: white;
+      color: black;
+    }
+
+    body.dark {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    .container.dark {
+      background-color: #1f1f1f;
+      color: #e0e0e0;
+    }
+
+    textarea, input[type="text"], select, input[type="color"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      box-sizing: border-box;
+      border-radius: 5px;
+    }
+
+    canvas {
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px;
+      width: 100%;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+
+    #logo-preview {
+      max-width: 100px;
+      margin-top: 10px;
+      display: none;
+      border: 1px solid #ccc;
+    }
+
+    .drag-area {
+      border: 2px dashed #aaa;
+      padding: 15px;
+      margin-top: 10px;
+      text-align: center;
+      border-radius: 5px;
+    }
+
+    .mode-toggle, .options {
+      margin-top: 15px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    #qr-container {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="">
+<div class="container" id="main-container">
+  <h1>Advanced QR Code Generator</h1>
+
+  <label>
+    <input type="checkbox" id="dark-mode-toggle">
+    Dark Mode
+  </label>
+
+  <div class="mode-toggle">
+    <label>
+      <input type="checkbox" id="mode-toggle">
+      Enable Logo Mode
+    </label>
+  </div>
+
+  <label>Enter text or URLs (one per line):</label>
+  <textarea id="qr-input" rows="4" placeholder="https://example.com"></textarea>
+
+  <label>Resolution</label>
+  <select id="resolution-select">
+    <option value="256">256x256</option>
+    <option value="512">512x512</option>
+    <option value="1024">1024x1024</option>
+  </select>
+
+  <label>QR Code Color</label>
+  <input type="color" id="qr-color" value="#000000">
+
+  <div id="logo-section" style="display: none;">
+    <label>Upload or drag a logo</label>
+    <div class="drag-area" id="drag-area">Drag and drop logo here or click to select</div>
+    <input type="file" id="logo-input" accept="image/*" style="display: none;">
+    <img id="logo-preview" alt="Logo Preview">
+  </div>
+
+  <button id="generate-btn">Generate QR Codes</button>
+  <button id="download-btn" disabled>Download as PNG</button>
+  <button id="pdf-btn" disabled>Export All to PDF</button>
+
+  <div id="qr-container"></div>
+</div>
+
+<script>
+  const logoSection = document.getElementById('logo-section');
+  const logoInput = document.getElementById('logo-input');
+  const logoPreview = document.getElementById('logo-preview');
+  const dragArea = document.getElementById('drag-area');
+  const canvasContainer = document.getElementById('qr-container');
+
+  let logoFile = null;
+  let currentCanvases = [];
+
+  document.getElementById('mode-toggle').addEventListener('change', function () {
+    logoSection.style.display = this.checked ? 'block' : 'none';
+    if (!this.checked) {
+      logoFile = null;
+      logoPreview.style.display = 'none';
+    }
+  });
+
+  document.getElementById('dark-mode-toggle').addEventListener('change', function () {
+    document.body.classList.toggle('dark');
+    document.getElementById('main-container').classList.toggle('dark');
+  });
+
+  dragArea.addEventListener('click', () => logoInput.click());
+  dragArea.addEventListener('dragover', e => {
+    e.preventDefault();
+    dragArea.style.borderColor = '#007bff';
+  });
+  dragArea.addEventListener('dragleave', e => {
+    e.preventDefault();
+    dragArea.style.borderColor = '#aaa';
+  });
+  dragArea.addEventListener('drop', e => {
+    e.preventDefault();
+    logoFile = e.dataTransfer.files[0];
+    previewLogo(logoFile);
+    dragArea.style.borderColor = '#aaa';
+  });
+  logoInput.addEventListener('change', e => {
+    logoFile = e.target.files[0];
+    previewLogo(logoFile);
+  });
+
+  function previewLogo(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      logoPreview.src = e.target.result;
+      logoPreview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  document.getElementById('generate-btn').addEventListener('click', async function () {
+    const lines = document.getElementById('qr-input').value.trim().split('\n').filter(Boolean);
+    const resolution = parseInt(document.getElementById('resolution-select').value);
+    const useLogo = document.getElementById('mode-toggle').checked;
+    const qrColor = document.getElementById('qr-color').value;
+
+    canvasContainer.innerHTML = '';
+    currentCanvases = [];
+
+    if (useLogo && !logoFile) {
+      alert('Logo is required in logo mode.');
+      return;
+    }
+
+    for (let i = 0; i < lines.length; i++) {
+      const text = lines[i];
+      const tempDiv = document.createElement('div');
+      new QRCode(tempDiv, {
+        text: text,
+        width: resolution,
+        height: resolution,
+        colorDark: qrColor,
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const img = tempDiv.querySelector('img');
+      const qrImage = new Image();
+      qrImage.src = img.src;
+
+      await new Promise(resolve => {
+        qrImage.onload = resolve;
+      });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = resolution;
+      canvas.height = resolution;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, resolution, resolution);
+      ctx.drawImage(qrImage, 0, 0, resolution, resolution);
+
+      if (useLogo && logoFile) {
+        const logo = new Image();
+        logo.src = URL.createObjectURL(logoFile);
+        await new Promise(resolve => {
+          logo.onload = resolve;
+        });
+        const logoSize = resolution * 0.35;
+        const x = (resolution - logoSize) / 2;
+        const y = (resolution - logoSize) / 2;
+        ctx.fillStyle = 'white';
+        ctx.fillRect(x, y, logoSize, logoSize);
+        ctx.drawImage(logo, x, y, logoSize, logoSize);
+        URL.revokeObjectURL(logo.src);
+      }
+
+      canvasContainer.appendChild(canvas);
+      currentCanvases.push(canvas);
+    }
+
+    document.getElementById('download-btn').disabled = false;
+    document.getElementById('pdf-btn').disabled = false;
+  });
+
+  document.getElementById('download-btn').addEventListener('click', () => {
+    currentCanvases.forEach((canvas, i) => {
+      const link = document.createElement('a');
+      link.download = `qr_code_${i + 1}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  });
+
+  document.getElementById('pdf-btn').addEventListener('click', async () => {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'px', format: 'a4' });
+    let y = 20;
+
+    for (let canvas of currentCanvases) {
+      const imgData = canvas.toDataURL('image/png');
+      pdf.addImage(imgData, 'PNG', 20, y, 200, 200);
+      y += 220;
+      if (y + 200 > pdf.internal.pageSize.height) {
+        pdf.addPage();
+        y = 20;
+      }
+    }
+
+    pdf.save('qr_codes.pdf');
+  });
+</script>
+</body>
+</html>
