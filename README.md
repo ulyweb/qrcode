@@ -37,39 +37,182 @@ Save this file as `index.html` in your repo. When pushed to GitHub Pages, it wil
       --primary: #8ab4f8; --success: #81c784; --error: #ef5350;
       --bg: #181c23; --panel: #23272f; --text: #eee; --border: #373e4b;
     }
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial, sans-serif; margin:0; padding:0; transition: background .3s, color .3s;}
-    .container { max-width: 540px; margin: 44px auto 30px auto; background: var(--panel); border-radius: 14px; box-shadow: 0 2px 24px #0002; padding: 32px 30px; transition: background .3s;}
-    h1 { text-align: center; color: var(--primary);}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin:0; padding:0;
+      transition: background .3s, color .3s;
+    }
+    .container {
+      max-width: 540px;
+      margin: 44px auto 30px auto;
+      background: var(--panel);
+      border-radius: 14px;
+      box-shadow: 0 2px 24px #0002;
+      padding: 32px 30px;
+      transition: background .3s;
+    }
+    h1 { text-align: center; color: var(--primary); }
     .tabs { display: flex; margin-bottom: 22px; }
-    .tab { flex: 1; text-align: center; padding: 13px; background: var(--bg); cursor: pointer; border-radius: 9px 9px 0 0; border-bottom: 2px solid var(--border); font-weight: 500; letter-spacing: 0.5px; user-select: none; color: var(--primary); transition: background .2s, color .2s;}
-    .tab.active { background: var(--panel); border-bottom: 2px solid var(--panel); color: var(--primary); font-weight: bold;}
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 13px;
+      background: var(--bg);
+      cursor: pointer;
+      border-radius: 9px 9px 0 0;
+      border-bottom: 2px solid var(--border);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      user-select: none;
+      color: var(--primary);
+      transition: background .2s, color .2s;
+    }
+    .tab.active {
+      background: var(--panel);
+      border-bottom: 2px solid var(--panel);
+      color: var(--primary);
+      font-weight: bold;
+    }
     .form-group { margin: 19px 0; }
     label { display: block; margin-bottom: 8px; }
-    input[type=text], input[type=password], input[type=file], textarea { width: 100%; padding: 11px; border-radius: 7px; border: 1px solid var(--border); font-size: 1rem; background: var(--bg); color: var(--text); transition: background .2s;}
-    input[type=file] { padding: 8px;}
-    button { background: var(--primary); color: #fff; border: none; padding: 13px 20px; border-radius: 8px; cursor: pointer; font-size: 1rem; margin-top: 8px; font-weight: 500; transition: background .2s;}
+    input[type=text],
+    input[type=password],
+    input[type=file],
+    textarea {
+      width: 100%;
+      padding: 11px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      font-size: 1rem;
+      background: var(--bg);
+      color: var(--text);
+      transition: background .2s;
+    }
+    input[type=file] { padding: 8px; }
+    button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 13px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 8px;
+      font-weight: 500;
+      transition: background .2s;
+    }
     button:hover, .btn-modal:hover { background: #174cb8; }
-    .output { margin-top: 22px; text-align: center; min-height: 26px;}
-    #qrcode { margin: 19px auto 0 auto;}
+    .btn-secondary {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      padding: 10px 14px;
+      font-size: 0.92rem;
+      margin-left: 6px;
+    }
+    .btn-secondary:hover { background: rgba(25,103,210,0.08); }
+    .output { margin-top: 22px; text-align: center; min-height: 26px; }
+    #qrcode { margin: 19px auto 0 auto; }
     .small { font-size: 0.96em; color: #888; }
     .hidden { display: none !important; }
     .success { color: var(--success); font-weight: 500; }
     .error { color: var(--error); font-weight: 500; }
-    .img-preview { margin: 10px auto 0 auto; display: block; max-width: 210px; border: 1px solid var(--border); border-radius: 6px;}
-    .footer { margin: 36px auto 10px auto; text-align: center; font-size: 0.97em; color: #888;}
-    .dark .footer { color: #aaa;}
-    .mode-switch { float: right; margin-top: -32px; margin-bottom: 12px;}
-    .mode-switch button { background: none; border: none; color: var(--primary); font-size: 1.2em; cursor: pointer; padding: 0 0 0 10px; vertical-align: middle;}
-    .modal { display: none; position: fixed; z-index: 12; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(32,32,40,0.6); align-items: center; justify-content: center;}
-    .modal.active { display: flex;}
-    .modal-content { background: var(--panel); color: var(--text); padding: 32px 18px 22px 18px; border-radius: 12px; max-width: 90vw; width: 380px; box-shadow: 0 6px 36px #0004; text-align: center; position: relative;}
-    .btn-modal { margin-top: 20px; background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 10px 30px; font-size: 1.03em; font-weight: 500; cursor: pointer; transition: background .2s;}
-    .btn-modal:active { background: #174cb8;}
+    .img-preview {
+      margin: 10px auto 0 auto;
+      display: block;
+      max-width: 210px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    .footer {
+      margin: 36px auto 10px auto;
+      text-align: center;
+      font-size: 0.97em;
+      color: #888;
+    }
+    .dark .footer { color: #aaa; }
+    .mode-switch { float: right; margin-top: -32px; margin-bottom: 12px; }
+    .mode-switch button {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 1.2em;
+      cursor: pointer;
+      padding: 0 0 0 10px;
+      vertical-align: middle;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 12;
+      left: 0; top: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(32,32,40,0.6);
+      align-items: center;
+      justify-content: center;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: var(--panel);
+      color: var(--text);
+      padding: 32px 18px 22px 18px;
+      border-radius: 12px;
+      max-width: 90vw;
+      width: 380px;
+      box-shadow: 0 6px 36px #0004;
+      text-align: center;
+      position: relative;
+    }
+    .btn-modal {
+      margin-top: 20px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 30px;
+      font-size: 1.03em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-modal:active { background: #174cb8; }
     #modal-decrypt-qrcode { margin: 15px auto; }
     #modal-download-btn { margin-top: 8px; }
-    @media (max-width: 680px) { .container { padding: 18px 3vw; } .modal-content { width: 94vw; } }
-    .footer a { color: var(--primary); text-decoration: none;}
-    .footer a:hover { text-decoration: underline;}
+    @media (max-width: 680px) {
+      .container { padding: 18px 3vw; }
+      .modal-content { width: 94vw; }
+    }
+    .footer a { color: var(--primary); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    /* Print layout: keep title + QR, hide UI */
+    @media print {
+      body, .container {
+        margin: 0;
+        background: #fff;
+        box-shadow: none;
+        border-radius: 0;
+      }
+      .mode-switch,
+      .tabs,
+      form,
+      #download-btn,
+      #print-btn,
+      .footer,
+      #panel-decrypt,
+      #qr-preview,
+      .output {
+        display: none !important;
+      }
+      #qrcode {
+        margin-top: 30px;
+      }
+      h1 {
+        margin-top: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -78,32 +221,49 @@ Save this file as `index.html` in your repo. When pushed to GitHub Pages, it wil
       <button id="darkModeBtn" title="Switch dark/light mode">🌙</button>
     </div>
     <h1>🔐 Password-Protected QR Code</h1>
+
     <div class="tabs">
       <div class="tab active" id="tab-generate" onclick="showTab('generate')">Generate QR</div>
       <div class="tab" id="tab-decrypt" onclick="showTab('decrypt')">Decrypt QR</div>
     </div>
+
+    <!-- Generate QR Code Tab -->
     <div id="panel-generate">
       <form id="form-generate" autocomplete="off">
         <div class="form-group">
-          <label for="secret">Secret Message <span class="small">(supports multiline up to ~180 chars for best reliability)</span></label>
-          <textarea id="secret" rows="3" maxlength="300" style="width:100%;resize:vertical;border-radius:7px;font-size:1rem;padding:9px;" required autocomplete="off"></textarea>
+          <label for="secret">
+            Secret Message
+            <span class="small">(supports multiline up to ~180 chars for best reliability)</span>
+          </label>
+          <textarea id="secret" rows="3" maxlength="350"
+            style="width:100%;resize:vertical;border-radius:7px;font-size:1rem;padding:9px;"
+            required autocomplete="off"></textarea>
         </div>
         <div class="form-group">
-          <label for="password">Password <span class="small">(minimum 13 alphanumeric and special chars)</span></label>
-          <input type="password" id="password" minlength="13" required>
+          <label for="password">
+            Password
+            <span class="small">(minimum 12 characters recommended)</span>
+          </label>
+          <input type="password" id="password" minlength="12" required>
         </div>
         <div class="form-group">
           <label for="password2">Confirm Password</label>
-          <input type="password" id="password2" minlength="6" required>
+          <input type="password" id="password2" minlength="12" required>
         </div>
         <button type="submit">Generate QR Code</button>
+        <button type="button" class="btn-secondary" onclick="loadTestSeed()">Use Test Secret Message (demo)</button>
       </form>
       <div class="output" id="gen-output"></div>
       <div id="qrcode"></div>
       <div id="download-btn" class="hidden">
         <button onclick="downloadQR()">⬇ Download QR Code</button>
       </div>
+      <div id="print-btn" class="hidden">
+        <button type="button" class="btn-secondary" onclick="printBackup()">🖨 Print Backup Page</button>
+      </div>
     </div>
+
+    <!-- Decrypt QR Tab -->
     <div id="panel-decrypt" class="hidden">
       <form id="form-decrypt" autocomplete="off">
         <div class="form-group">
@@ -120,7 +280,8 @@ Save this file as `index.html` in your repo. When pushed to GitHub Pages, it wil
       <img id="qr-preview" class="img-preview hidden" src="#" alt="QR Preview">
     </div>
   </div>
-  <!-- Modal for Decrypted Message + QR -->
+
+  <!-- Modal for decrypted message + QR -->
   <div id="modal" class="modal" onclick="closeModal(event)">
     <div class="modal-content" onclick="event.stopPropagation();">
       <div id="modal-msg" style="white-space: pre-line;word-break:break-word;"></div>
@@ -131,15 +292,18 @@ Save this file as `index.html` in your repo. When pushed to GitHub Pages, it wil
       <button class="btn-modal" onclick="closeModal()">Close</button>
     </div>
   </div>
+
   <div class="footer">
     Built with <span aria-label="love">❤️</span> for GitHub Pages.<br>
-    <a href="https://github.com/ulyhome-live/qrcode" target="_blank">[Source code]</a>
-    <span class="small"><br>No data ever leaves your browser.</span>
+    <span class="small">No data ever leaves your browser.</span>
   </div>
+
+  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
   <script>
-    // --- DARK MODE LOGIC ---
+    // --- Dark mode ---
     function isDarkSystem() {
       return window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
@@ -149,8 +313,7 @@ Save this file as `index.html` in your repo. When pushed to GitHub Pages, it wil
       document.getElementById('darkModeBtn').textContent = enable ? '☀️' : '🌙';
     }
     function toggleDarkMode() {
-      const dark = document.documentElement.classList.contains('dark');
-      setDarkMode(!dark);
+      setDarkMode(!document.documentElement.classList.contains('dark'));
     }
     (function() {
       const ls = localStorage.getItem('qrtool-dark');
@@ -159,7 +322,7 @@ Save this file as `index.html` in your repo. When pushed to GitHub Pages, it wil
     })();
     document.getElementById('darkModeBtn').onclick = toggleDarkMode;
 
-    // --- TAB LOGIC ---
+    // --- Tabs ---
     function showTab(tab) {
       document.getElementById('panel-generate').classList.toggle('hidden', tab !== 'generate');
       document.getElementById('panel-decrypt').classList.toggle('hidden', tab !== 'decrypt');
@@ -169,146 +332,239 @@ Save this file as `index.html` in your repo. When pushed to GitHub Pages, it wil
       document.getElementById('dec-output').textContent = '';
       document.getElementById('qrcode').innerHTML = '';
       document.getElementById('download-btn').classList.add('hidden');
+      document.getElementById('print-btn').classList.add('hidden');
       document.getElementById('qr-preview').classList.add('hidden');
       document.getElementById('form-generate').reset();
       document.getElementById('form-decrypt').reset();
     }
 
-    // --- CRYPTO HELPERS ---
+    // --- Utility: timestamped filenames ---
+    function getTimeName(suffix) {
+      const now = new Date();
+      const pad = n => n.toString().padStart(2,'0');
+      const y = now.getFullYear();
+      const m = pad(now.getMonth()+1);
+      const d = pad(now.getDate());
+      const h = pad(now.getHours());
+      const mi = pad(now.getMinutes());
+      const s = pad(now.getSeconds());
+      return `${y}-${m}-${d}_${h}-${mi}-${s}_${suffix}.png`;
+    }
+
+    // --- Base64 helpers for binary ---
+    function bytesToBase64(bytes) {
+      let bin = "";
+      for (let i = 0; i < bytes.length; i++) {
+        bin += String.fromCharCode(bytes[i]);
+      }
+      return btoa(bin);
+    }
+    function base64ToBytes(b64) {
+      const clean = (b64 || "").replace(/[\n\r\s]+/g, "");
+      const bin = atob(clean);
+      const len = bin.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = bin.charCodeAt(i);
+      }
+      return bytes;
+    }
+
+    // --- Crypto helpers (PBKDF2 + AES-256-CBC) ---
     async function getKey(password, salt, usage) {
       const enc = new TextEncoder();
-      return crypto.subtle.importKey(
-        'raw', enc.encode(password), {name: 'PBKDF2'}, false, ['deriveKey']
-      ).then(baseKey =>
-        crypto.subtle.deriveKey(
-          {
-            name: 'PBKDF2',
-            salt,
-            iterations: 100000,
-            hash: 'SHA-256'
-          },
-          baseKey,
-          { name: 'AES-CBC', length: 256 },
-          false,
-          usage
-        )
+      const baseKey = await crypto.subtle.importKey(
+        "raw",
+        enc.encode(password),
+        { name: "PBKDF2" },
+        false,
+        ["deriveKey"]
+      );
+      return crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt,
+          iterations: 100000,
+          hash: "SHA-256"
+        },
+        baseKey,
+        { name: "AES-CBC", length: 256 },
+        false,
+        usage
       );
     }
+
+    // Compact binary payload: [version(1)][salt16][iv16][ciphertext...]
     async function encryptData(secret, password) {
       const enc = new TextEncoder();
       const salt = crypto.getRandomValues(new Uint8Array(16));
-      const iv = crypto.getRandomValues(new Uint8Array(16));
-      const key = await getKey(password, salt, ['encrypt']);
+      const iv   = crypto.getRandomValues(new Uint8Array(16));
+      const key  = await getKey(password, salt, ["encrypt"]);
       const data = enc.encode(secret);
-      const ct = await crypto.subtle.encrypt({name: 'AES-CBC', iv}, key, data);
-      // Return as base64-encoded JSON
-      const payload = {
-        salt: Array.from(salt),
-        iv: Array.from(iv),
-        ct: Array.from(new Uint8Array(ct))
-      };
-      return btoa(JSON.stringify(payload));
+      const ctArrayBuffer = await crypto.subtle.encrypt({ name: "AES-CBC", iv }, key, data);
+      const ct = new Uint8Array(ctArrayBuffer);
+
+      const payload = new Uint8Array(1 + 16 + 16 + ct.length);
+      payload[0] = 1; // version
+      payload.set(salt, 1);
+      payload.set(iv, 1 + 16);
+      payload.set(ct, 1 + 16 + 16);
+
+      return bytesToBase64(payload);
     }
+
     async function decryptData(b64payload, password) {
       try {
-        const cleanB64 = (b64payload||"").replace(/[\n\r\s]+/g,'');
-        const payload = JSON.parse(atob(cleanB64));
-        const salt = new Uint8Array(payload.salt);
-        const iv = new Uint8Array(payload.iv);
-        const ct = new Uint8Array(payload.ct);
-        const key = await getKey(password, salt, ['decrypt']);
-        const pt = await crypto.subtle.decrypt({name: 'AES-CBC', iv}, key, ct);
-        return new TextDecoder().decode(pt);
+        const payload = base64ToBytes(b64payload);
+        if (payload.length < 1 + 16 + 16) {
+          throw new Error("Payload too short");
+        }
+        const version = payload[0];
+        if (version !== 1) {
+          throw new Error("Unsupported payload version");
+        }
+        const salt = payload.slice(1, 17);
+        const iv   = payload.slice(17, 33);
+        const ct   = payload.slice(33);
+
+        const key = await getKey(password, salt, ["decrypt"]);
+        const ptArrayBuffer = await crypto.subtle.decrypt(
+          { name: "AES-CBC", iv },
+          key,
+          ct
+        );
+        return new TextDecoder().decode(ptArrayBuffer);
       } catch (e) {
         throw new Error("Decryption failed: wrong password or invalid QR code.");
       }
     }
 
-    // --- GENERATE QR CODE ---
-    document.getElementById('form-generate').onsubmit = async function(e) {
+    // --- Generate QR ---
+    document.getElementById("form-generate").onsubmit = async function(e) {
       e.preventDefault();
-      const secret = document.getElementById('secret').value;
-      const pw = document.getElementById('password').value;
-      const pw2 = document.getElementById('password2').value;
-      const output = document.getElementById('gen-output');
-      output.textContent = '';
-      document.getElementById('qrcode').innerHTML = '';
-      document.getElementById('download-btn').classList.add('hidden');
+      const secret = document.getElementById("secret").value;
+      const pw  = document.getElementById("password").value;
+      const pw2 = document.getElementById("password2").value;
+      const output = document.getElementById("gen-output");
+
+      output.textContent = "";
+      document.getElementById("qrcode").innerHTML = "";
+      document.getElementById("download-btn").classList.add("hidden");
+      document.getElementById("print-btn").classList.add("hidden");
+
       if (pw !== pw2) {
         output.innerHTML = '<span class="error">Passwords do not match.</span>';
         return;
       }
-      if (pw.length < 6) {
-        output.innerHTML = '<span class="error">Password must be at least 6 characters.</span>';
+      if (pw.length < 12) {
+        output.innerHTML = '<span class="error">Password must be at least 12 characters.</span>';
         return;
       }
-      if (secret.length > 300) {
-        output.innerHTML = '<span class="error">Secret message too long for QR code!</span>';
+      // Practical safety cap: seeds (12–24 words) fit easily under this.
+      if (secret.length > 350) {
+        output.innerHTML = '<span class="error">Secret message too long for this QR format.</span>';
         return;
       }
-      output.innerHTML = 'Encrypting...';
+
+      output.innerHTML = "Encrypting...";
       try {
         const encrypted = await encryptData(secret, pw);
-        if (encrypted.length > 900) {
-          output.innerHTML = '<span class="error">Encrypted data too large for QR code! Try a shorter secret or password.</span>';
+
+        // Safety cap for QR size (compact format lets us raise this a lot)
+        if (encrypted.length > 1800) {
+          output.innerHTML =
+            '<span class="error">Encrypted data too large for a reliable QR code. Try a shorter secret.</span>';
           return;
         }
+
         output.innerHTML = '<span class="success">QR code generated below!</span>';
         setTimeout(() => {
-          new QRCode(document.getElementById('qrcode'), {
+          new QRCode(document.getElementById("qrcode"), {
             text: encrypted,
             width: 300,
             height: 300,
             correctLevel: QRCode.CorrectLevel.H
           });
-          document.getElementById('download-btn').classList.remove('hidden');
+          document.getElementById("download-btn").classList.remove("hidden");
+          document.getElementById("print-btn").classList.remove("hidden");
         }, 100);
       } catch (err) {
-        output.innerHTML = '<span class="error">Error: ' + err.message + '</span>';
+        output.innerHTML = '<span class="error">Error: ' + err.message + "</span>";
       }
     };
+
+    // Test seed loader
+    function loadTestSeed() {
+      const demoSecret =
+        "test secret message only do not use for any real phrase message please";
+      const demoPw = "DemoPassword123!";
+      document.getElementById("secret").value = demoSecret;
+      document.getElementById("password").value = demoPw;
+      document.getElementById("password2").value = demoPw;
+      const out = document.getElementById("gen-output");
+      out.innerHTML =
+        '<span class="success">Test seed and password loaded. Click "Generate QR Code" to try the workflow.</span>';
+    }
+
+    // Download encrypted QR
     window.downloadQR = function() {
-      const qrCanvas = document.querySelector('#qrcode canvas');
+      const qrCanvas = document.querySelector("#qrcode canvas");
       if (!qrCanvas) return;
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = qrCanvas.toDataURL();
-      link.download = 'secret-qr.png';
+      link.download = getTimeName("secret-qr");
       link.click();
     };
-    document.getElementById('form-decrypt').onsubmit = async function(e) {
+
+    // Print backup (encrypted QR only, thanks to @media print)
+    function printBackup() {
+      window.print();
+    }
+
+    // --- Decrypt QR ---
+    document.getElementById("form-decrypt").onsubmit = async function(e) {
       e.preventDefault();
-      const file = document.getElementById('qrimg').files[0];
-      const password = document.getElementById('dec-password').value;
-      const output = document.getElementById('dec-output');
-      output.textContent = '';
+      const file = document.getElementById("qrimg").files[0];
+      const password = document.getElementById("dec-password").value;
+      const output = document.getElementById("dec-output");
+      output.textContent = "";
+
       if (!file) {
         output.innerHTML = '<span class="error">Please select a QR image.</span>';
         return;
       }
+
       const reader = new FileReader();
       reader.onload = async function(evt) {
         const img = new window.Image();
         img.onload = async function() {
-          document.getElementById('qr-preview').src = evt.target.result;
-          document.getElementById('qr-preview').classList.remove('hidden');
-          const canvas = document.createElement('canvas');
+          document.getElementById("qr-preview").src = evt.target.result;
+          document.getElementById("qr-preview").classList.remove("hidden");
+
+          const canvas = document.createElement("canvas");
           canvas.width = img.width;
           canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
+          const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0);
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
           const code = jsQR(imageData.data, canvas.width, canvas.height);
           if (!code) {
             output.innerHTML = '<span class="error">No QR code found in image.</span>';
             return;
           }
+
           try {
-            output.innerHTML = 'Decrypting...';
+            output.innerHTML = "Decrypting...";
             const decrypted = await decryptData(code.data, password);
-            showModal(`<span class="success">Decrypted message:</span><br><pre style="white-space: pre-wrap;font-size:1.1em;">${escapeHtml(decrypted)}</pre>`, decrypted);
-            output.innerHTML = '';
+            showModal(
+              '<span class="success">Decrypted message:</span><br><pre style="white-space: pre-wrap;font-size:1.1em;">'
+              + escapeHtml(decrypted) + "</pre>",
+              decrypted
+            );
+            output.innerHTML = "";
           } catch (err) {
-            output.innerHTML = '<span class="error">' + err.message + '</span>';
+            output.innerHTML = '<span class="error">' + err.message + "</span>";
           }
         };
         img.onerror = function() {
@@ -318,11 +574,14 @@ Save this file as `index.html` in your repo. When pushed to GitHub Pages, it wil
       };
       reader.readAsDataURL(file);
     };
+
+    // Modal + decrypted QR
     function showModal(msg, plainText) {
-      document.getElementById('modal-msg').innerHTML = msg;
-      var modalQRDiv = document.getElementById('modal-decrypt-qrcode');
-      modalQRDiv.innerHTML = '';
-      document.getElementById('modal-download-btn').classList.add('hidden');
+      document.getElementById("modal-msg").innerHTML = msg;
+      const modalQRDiv = document.getElementById("modal-decrypt-qrcode");
+      modalQRDiv.innerHTML = "";
+      document.getElementById("modal-download-btn").classList.add("hidden");
+
       if (plainText && plainText.length <= 2950) {
         setTimeout(function() {
           new QRCode(modalQRDiv, {
@@ -331,22 +590,30 @@ Save this file as `index.html` in your repo. When pushed to GitHub Pages, it wil
             height: 200,
             correctLevel: QRCode.CorrectLevel.H
           });
-          document.getElementById('modal-download-btn').classList.remove('hidden');
+          document.getElementById("modal-download-btn").classList.remove("hidden");
         }, 100);
       }
-      document.getElementById('modal').classList.add('active');
+      document.getElementById("modal").classList.add("active");
     }
+
     function downloadDecryptedQR() {
-      var qrCanvas = document.querySelector('#modal-decrypt-qrcode canvas');
+      const qrCanvas = document.querySelector("#modal-decrypt-qrcode canvas");
       if (!qrCanvas) return;
-      var link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = qrCanvas.toDataURL();
-      link.download = 'decrypted-message-qr.png';
+      link.download = getTimeName("decrypted-qr");
       link.click();
     }
-    function closeModal(evt) { document.getElementById('modal').classList.remove('active'); }
+
+    function closeModal() {
+      document.getElementById("modal").classList.remove("active");
+    }
+
     function escapeHtml(str) {
-      return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return (str || "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;");
     }
   </script>
 </body>
