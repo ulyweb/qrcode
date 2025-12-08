@@ -228,7 +228,7 @@
           <input type="password" id="password2" minlength="12" required>
         </div>
         <button type="submit">Generate QR Code</button>
-        <button type="button" class="btn-secondary" onclick="loadTestSeed()">Use Test Seed (demo)</button>
+        <button type="button" class="btn-secondary" onclick="loadTestSeed()">Use Test Secret Message (demo)</button>
       </form>
       <div class="output" id="gen-output"></div>
       <div id="qrcode"></div>
@@ -473,7 +473,7 @@
     // Test seed loader
     function loadTestSeed() {
       const demoSecret =
-        "test seed phrase only do not use for any real funds please";
+        "test secret message only do not use for any real phrase message please";
       const demoPw = "DemoPassword123!";
       document.getElementById("secret").value = demoSecret;
       document.getElementById("password").value = demoPw;
